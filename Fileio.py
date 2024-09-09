@@ -4,7 +4,20 @@ from tkinter import filedialog as fd
 from tkinter import ttk
 import requests
 import pyperclip
+import json
+import os
 
+history_file = 'upload_history.json'
+
+
+def save_history(file_path, link):
+    history = []
+    if os.path. exists(history_file): # проверяе, что history_file существует в папке
+        with open(history_file, 'r') as f:
+            history = json.load(f)
+    history.append({'file_path': os.path.basename(file_path), 'download_link': link})
+    with open(history_file, 'w') as f:
+        json.dump(history, f, indent=4)
 
 def upload():
     try:
@@ -18,6 +31,7 @@ def upload():
                 entry.delete(0, END) # очищает поле ввода
                 entry.insert(0, link) # вводит ссылку на сайт
                 pyperclip.copy(link) # добавляет ссылку для скачивания в буфер обмена
+                save_history(filepath, link)
                 mb.showinfo('Ссылка скопирована', f'Ссылка {link} успешно скопирована в буфер обмена')
     except Exception as e:
         mb.showerror('Ошибка', 'Произошла ошибка: {e}')
